@@ -4,15 +4,15 @@ import { motion, useScroll, useVelocity, useSpring, useTransform } from 'framer-
 const About: React.FC = () => {
   const { scrollY } = useScroll();
   
-  // -- CORRECTED SCROLL DIRECTION MOTION LOGIC --
+  // -- REVERSED SCROLL DIRECTION MOTION LOGIC --
   const scrollVelocity = useVelocity(scrollY);
   const smoothVelocity = useSpring(scrollVelocity, {
     damping: 60,
     stiffness: 500
   });
   
-  // Scroll DOWN (+) -> Text UP (-). Max 12px.
-  const textShift = useTransform(smoothVelocity, [-2000, 2000], [12, -12]);
+  // Scroll DOWN (+) -> Text DOWN (+). Max 12px.
+  const textShift = useTransform(smoothVelocity, [-2000, 2000], [-12, 12]);
   // -----------------------------------
 
   return (

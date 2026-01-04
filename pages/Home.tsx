@@ -5,21 +5,19 @@ import { motion, useScroll, useTransform, AnimatePresence, useVelocity, useSprin
 const Home: React.FC = () => {
   const { scrollY } = useScroll();
   
-  // -- CORRECTED SCROLL DIRECTION MOTION LOGIC --
-  // We calculate velocity and apply a tight spring to remove lag
+  // -- REVERSED SCROLL DIRECTION MOTION LOGIC --
   const scrollVelocity = useVelocity(scrollY);
   const smoothVelocity = useSpring(scrollVelocity, {
-    damping: 60, // Increased damping for weighted, non-jittery settle
-    stiffness: 500 // Increased stiffness for immediate response (low latency)
+    damping: 60,
+    stiffness: 500
   });
   
   /** 
-   * DIRECTION FIX: 
-   * Scroll DOWN (Velocity +) -> Text moves UP (Y -)
-   * Scroll UP (Velocity -) -> Text moves DOWN (Y +)
-   * Max offset limited to 12px for luxury subtlety.
+   * DIRECTION REVERSAL: 
+   * Scroll DOWN (Velocity +) -> Text moves DOWN (Y +)
+   * Scroll UP (Velocity -) -> Text moves UP (Y -)
    */
-  const textShift = useTransform(smoothVelocity, [-2000, 2000], [12, -12]);
+  const textShift = useTransform(smoothVelocity, [-2000, 2000], [-12, 12]);
   // ---------------------------------------------
 
   const heroY = useTransform(scrollY, [0, 500], [0, 150]);
