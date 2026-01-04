@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
 const productData: Record<string, any> = {
   'hepple-gin': {
@@ -49,71 +50,106 @@ const productData: Record<string, any> = {
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const product = productData[id || 'hepple-gin'];
+  const { scrollY } = useScroll();
+  const bottleY = useTransform(scrollY, [0, 1000], [0, 80]);
 
   if (!product) return <div className="pt-32 text-center serif text-3xl">Spirits not found.</div>;
 
   return (
-    <div className="py-24 px-8 max-w-screen-xl mx-auto fade-up">
-      <Link to="/collection" className="text-[9px] uppercase tracking-[0.4em] text-[#555] hover:text-white transition-colors mb-16 inline-block">← Back to Range</Link>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
-        <div className="lg:sticky lg:top-32 bg-white/5 p-20 product-glow">
-          <img src={product.image} className="w-full h-[600px] object-contain" alt={product.name} />
-        </div>
+    <div className="py-24 px-8 max-w-screen-xl mx-auto">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.5 }}
+      >
+        <Link to="/collection" className="group inline-flex items-center text-[9px] uppercase tracking-[0.4em] text-[#555] hover:text-white transition-colors mb-16">
+          <span className="mr-2 group-hover:-translate-x-1 transition-transform">←</span> Back to Range
+        </Link>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-start">
+          <div className="lg:sticky lg:top-32 bg-white/5 p-24 product-glow flex justify-center items-center min-h-[700px]">
+            <motion.img 
+              style={{ y: bottleY }}
+              src={product.image} 
+              className="max-h-[600px] object-contain drop-shadow-2xl" 
+              alt={product.name} 
+            />
+          </div>
 
-        <div className="space-y-16">
-          <header>
-            <span className="text-[10px] uppercase tracking-[0.3em] text-[#6d7e6d] font-bold mb-4 block">{product.tagline}</span>
-            <h1 className="serif text-5xl md:text-7xl mb-6">{product.name}</h1>
-            <p className="text-2xl font-light text-[#888] mb-10">{product.price}</p>
-            <p className="text-[#aaa] text-lg leading-relaxed font-light italic">
-              {product.description}
-            </p>
-          </header>
+          <div className="space-y-20 py-12">
+            <motion.header 
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1, ease: [0.2, 0, 0, 1] }}
+            >
+              <span className="text-[10px] uppercase tracking-[0.4em] text-[#6d7e6d] font-bold mb-6 block">{product.tagline}</span>
+              <h1 className="serif text-5xl md:text-8xl mb-8 leading-tight italic">{product.name}</h1>
+              <p className="text-2xl font-light text-[#888] mb-12">{product.price}</p>
+              <p className="text-[#aaa] text-xl leading-relaxed font-light border-l border-white/5 pl-8 italic">
+                {product.description}
+              </p>
+            </motion.header>
 
-          <section>
-            <h3 className="text-[10px] uppercase tracking-[0.4em] text-white font-bold mb-8 border-b border-white/10 pb-4">Botanical Profile</h3>
-            <ul className="grid grid-cols-2 gap-4">
-              {product.botanicals.map((b: string) => (
-                <li key={b} className="text-xs uppercase tracking-widest text-[#666] flex items-center">
-                  <span className="w-1 h-1 bg-[#2d3a2d] mr-3"></span> {b}
-                </li>
-              ))}
-            </ul>
-          </section>
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1 }}
+            >
+              <h3 className="text-[10px] uppercase tracking-[0.4em] text-white font-bold mb-10 border-b border-white/10 pb-4">Botanical Profile</h3>
+              <ul className="grid grid-cols-2 gap-6">
+                {product.botanicals.map((b: string) => (
+                  <li key={b} className="text-xs uppercase tracking-[0.2em] text-[#555] flex items-center hover:text-white transition-colors">
+                    <span className="w-1 h-1 bg-[#2d3a2d] mr-4"></span> {b}
+                  </li>
+                ))}
+              </ul>
+            </motion.section>
 
-          <section className="bg-white/[0.03] p-10 space-y-10">
-            <h3 className="serif text-2xl italic text-center">Tasting Notes</h3>
-            <div className="grid grid-cols-1 gap-10">
-                <div>
-                    <span className="text-[9px] uppercase tracking-widest text-[#555] block mb-2">The Nose</span>
-                    <p className="text-[#888] font-light">{product.notes.nose}</p>
-                </div>
-                <div>
-                    <span className="text-[9px] uppercase tracking-widest text-[#555] block mb-2">The Palate</span>
-                    <p className="text-[#888] font-light">{product.notes.palate}</p>
-                </div>
-                <div>
-                    <span className="text-[9px] uppercase tracking-widest text-[#555] block mb-2">The Finish</span>
-                    <p className="text-[#888] font-light">{product.notes.finish}</p>
-                </div>
+            <motion.section 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="bg-white/[0.02] p-12 space-y-12 border border-white/5"
+            >
+              <h3 className="serif text-3xl italic text-center text-[#999]">Tasting Notes</h3>
+              <div className="grid grid-cols-1 gap-12">
+                  <div className="group">
+                      <span className="text-[9px] uppercase tracking-[0.4em] text-[#444] block mb-4 group-hover:text-[#888] transition-colors">The Nose</span>
+                      <p className="text-[#888] font-light text-lg leading-relaxed">{product.notes.nose}</p>
+                  </div>
+                  <div className="group">
+                      <span className="text-[9px] uppercase tracking-[0.4em] text-[#444] block mb-4 group-hover:text-[#888] transition-colors">The Palate</span>
+                      <p className="text-[#888] font-light text-lg leading-relaxed">{product.notes.palate}</p>
+                  </div>
+                  <div className="group">
+                      <span className="text-[9px] uppercase tracking-[0.4em] text-[#444] block mb-4 group-hover:text-[#888] transition-colors">The Finish</span>
+                      <p className="text-[#888] font-light text-lg leading-relaxed">{product.notes.finish}</p>
+                  </div>
+              </div>
+            </motion.section>
+
+            <motion.section 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="border border-white/5 p-12"
+            >
+              <h3 className="text-[10px] uppercase tracking-[0.4em] text-white font-bold mb-8">Service Suggestion</h3>
+              <p className="text-[#aaa] font-light leading-relaxed text-lg italic">
+                  {product.cocktail}
+              </p>
+            </motion.section>
+
+            <div className="pt-12">
+               <Link to={`/checkout/${id}`} className="group relative block w-full text-center py-7 bg-white overflow-hidden transition-all duration-700">
+                 <span className="relative z-10 text-black text-xs uppercase tracking-[0.5em] font-bold group-hover:text-white transition-colors duration-500">Purchase Now</span>
+                 <div className="absolute inset-0 bg-[#111] -translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.2,0,0,1)]"></div>
+               </Link>
             </div>
-          </section>
-
-          <section className="border border-white/10 p-10">
-            <h3 className="text-[10px] uppercase tracking-[0.4em] text-white font-bold mb-6">Service Suggestion</h3>
-            <p className="text-[#aaa] font-light leading-relaxed">
-                {product.cocktail}
-            </p>
-          </section>
-
-          <div className="pt-8">
-             <Link to={`/checkout/${id}`} className="block w-full text-center py-6 bg-white text-black text-xs uppercase tracking-[0.4em] font-bold hover:bg-[#c0c0c0] transition-colors">
-               Purchase Now
-             </Link>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
