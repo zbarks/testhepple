@@ -5,16 +5,22 @@ import { motion, useScroll, useTransform, AnimatePresence, useVelocity, useSprin
 const Home: React.FC = () => {
   const { scrollY } = useScroll();
   
-  // -- SCROLL DIRECTION MOTION LOGIC --
-  // Detects the speed and direction of scrolling to apply a subtle counter-shift to text
+  // -- CORRECTED SCROLL DIRECTION MOTION LOGIC --
+  // We calculate velocity and apply a tight spring to remove lag
   const scrollVelocity = useVelocity(scrollY);
   const smoothVelocity = useSpring(scrollVelocity, {
-    damping: 50,
-    stiffness: 400
+    damping: 60, // Increased damping for weighted, non-jittery settle
+    stiffness: 500 // Increased stiffness for immediate response (low latency)
   });
-  // Maps high velocity to a maximum of 15px offset in either direction
-  const textShift = useTransform(smoothVelocity, [-3000, 3000], [15, -15]);
-  // -----------------------------------
+  
+  /** 
+   * DIRECTION FIX: 
+   * Scroll DOWN (Velocity +) -> Text moves UP (Y -)
+   * Scroll UP (Velocity -) -> Text moves DOWN (Y +)
+   * Max offset limited to 12px for luxury subtlety.
+   */
+  const textShift = useTransform(smoothVelocity, [-2000, 2000], [12, -12]);
+  // ---------------------------------------------
 
   const heroY = useTransform(scrollY, [0, 500], [0, 150]);
   const introY = useTransform(scrollY, [400, 1200], [40, -40]);
@@ -64,7 +70,7 @@ const Home: React.FC = () => {
           className="relative z-10 text-center px-4 max-w-5xl"
         >
           <motion.span 
-            style={{ y: textShift }} // Applied scroll-direction motion
+            style={{ y: textShift }} 
             initial={{ opacity: 0, letterSpacing: '0.8em' }}
             animate={{ opacity: 1, letterSpacing: '0.5em' }}
             transition={{ duration: 1.5, delay: 0.2 }}
@@ -73,7 +79,7 @@ const Home: React.FC = () => {
             Distilled in the Wild
           </motion.span>
           <motion.h1 
-            style={{ y: textShift }} // Applied scroll-direction motion
+            style={{ y: textShift }} 
             className="text-6xl md:text-9xl serif mb-12 italic leading-tight tracking-tight"
           >
             Nature, Refined.
