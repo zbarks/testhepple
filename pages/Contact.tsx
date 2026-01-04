@@ -1,12 +1,24 @@
 import React from 'react';
+import { motion, useScroll, useVelocity, useSpring, useTransform } from 'framer-motion';
 
 const Contact: React.FC = () => {
+  const { scrollY } = useScroll();
+  
+  // -- SCROLL DIRECTION MOTION LOGIC --
+  const scrollVelocity = useVelocity(scrollY);
+  const smoothVelocity = useSpring(scrollVelocity, {
+    damping: 50,
+    stiffness: 400
+  });
+  const textShift = useTransform(smoothVelocity, [-3000, 3000], [15, -15]);
+  // -----------------------------------
+
   return (
-    <div className="py-24 px-8 max-w-screen-md mx-auto fade-up">
+    <div className="py-24 px-8 max-w-screen-md mx-auto">
       <header className="text-center mb-20 space-y-6">
-        <span className="text-[10px] uppercase tracking-[0.5em] text-[#555]">Communication</span>
-        <h1 className="serif text-6xl md:text-7xl">Inquiries</h1>
-        <p className="text-[#888] font-light">Join our story or request a stockist list.</p>
+        <motion.span style={{ y: textShift }} className="text-[10px] uppercase tracking-[0.5em] text-[#555] block">Communication</motion.span>
+        <motion.h1 style={{ y: textShift }} className="serif text-6xl md:text-7xl">Inquiries</motion.h1>
+        <motion.p style={{ y: textShift }} className="text-[#888] font-light">Join our story or request a stockist list.</motion.p>
       </header>
 
       <form className="space-y-12">
@@ -43,16 +55,16 @@ const Contact: React.FC = () => {
       
       <div className="mt-32 text-center grid grid-cols-1 md:grid-cols-3 gap-12 border-t border-white/5 pt-12">
           <div>
-              <span className="text-[9px] uppercase tracking-widest text-[#444] block mb-4">Stockists</span>
-              <p className="text-sm text-[#888]">Find us at Liberty, Berry Bros & Rudd, and selected boutiques.</p>
+              <motion.span style={{ y: textShift }} className="text-[9px] uppercase tracking-widest text-[#444] block mb-4">Stockists</motion.span>
+              <motion.p style={{ y: textShift }} className="text-sm text-[#888]">Find us at Liberty, Berry Bros & Rudd, and selected boutiques.</motion.p>
           </div>
           <div>
-              <span className="text-[9px] uppercase tracking-widest text-[#444] block mb-4">Mailing</span>
-              <p className="text-sm text-[#888]">Hepple Estate, Morpeth,<br/>Northumberland, NE65 7LH</p>
+              <motion.span style={{ y: textShift }} className="text-[9px] uppercase tracking-widest text-[#444] block mb-4">Mailing</motion.span>
+              <motion.p style={{ y: textShift }} className="text-sm text-[#888]">Hepple Estate, Morpeth,<br/>Northumberland, NE65 7LH</motion.p>
           </div>
           <div>
-              <span className="text-[9px] uppercase tracking-widest text-[#444] block mb-4">Press</span>
-              <p className="text-sm text-[#888]">For imagery and press packs:<br/>press@hepplespirits.com</p>
+              <motion.span style={{ y: textShift }} className="text-[9px] uppercase tracking-widest text-[#444] block mb-4">Press</motion.span>
+              <motion.p style={{ y: textShift }} className="text-sm text-[#888]">For imagery and press packs:<br/>press@hepplespirits.com</motion.p>
           </div>
       </div>
     </div>

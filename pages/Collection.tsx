@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useVelocity, useSpring, useTransform } from 'framer-motion';
 
 const products = [
   {
@@ -30,10 +30,22 @@ const products = [
 ];
 
 const Collection: React.FC = () => {
+  const { scrollY } = useScroll();
+  
+  // -- SCROLL DIRECTION MOTION LOGIC --
+  const scrollVelocity = useVelocity(scrollY);
+  const smoothVelocity = useSpring(scrollVelocity, {
+    damping: 50,
+    stiffness: 400
+  });
+  const textShift = useTransform(smoothVelocity, [-3000, 3000], [15, -15]);
+  // -----------------------------------
+
   return (
     <div className="py-24 px-8 max-w-screen-2xl mx-auto">
       <header className="mb-40 text-center">
         <motion.span 
+          style={{ y: textShift }}
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -43,6 +55,7 @@ const Collection: React.FC = () => {
           The Distillery Range
         </motion.span>
         <motion.h1 
+          style={{ y: textShift }}
           initial={{ opacity: 0, scale: 0.98 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
@@ -80,15 +93,15 @@ const Collection: React.FC = () => {
             
             <div className="flex justify-between items-start mb-6">
                 <div className="space-y-2">
-                    <h2 className="serif text-3xl group-hover:italic transition-all duration-500">{product.name}</h2>
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#6d7e6d] font-bold">{product.tagline}</p>
+                    <motion.h2 style={{ y: textShift }} className="serif text-3xl group-hover:italic transition-all duration-500">{product.name}</motion.h2>
+                    <motion.p style={{ y: textShift }} className="text-[10px] uppercase tracking-[0.2em] text-[#6d7e6d] font-bold">{product.tagline}</motion.p>
                 </div>
-                <span className="text-sm font-light text-[#555] italic">{product.price}</span>
+                <motion.span style={{ y: textShift }} className="text-sm font-light text-[#555] italic">{product.price}</motion.span>
             </div>
             
-            <p className="text-[#777] font-light text-base leading-relaxed mb-10 max-w-sm">
+            <motion.p style={{ y: textShift }} className="text-[#777] font-light text-base leading-relaxed mb-10 max-w-sm">
                 {product.description}
-            </p>
+            </motion.p>
             
             <Link to={`/checkout/${product.id}`} className="relative block w-full text-center py-5 border border-white/10 group-hover:border-white/30 overflow-hidden transition-all duration-700">
                 <span className="relative z-10 text-[9px] uppercase tracking-[0.4em] font-bold group-hover:text-black transition-colors duration-500">Add to Collection</span>

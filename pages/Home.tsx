@@ -1,9 +1,21 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence, useVelocity, useSpring } from 'framer-motion';
 
 const Home: React.FC = () => {
   const { scrollY } = useScroll();
+  
+  // -- SCROLL DIRECTION MOTION LOGIC --
+  // Detects the speed and direction of scrolling to apply a subtle counter-shift to text
+  const scrollVelocity = useVelocity(scrollY);
+  const smoothVelocity = useSpring(scrollVelocity, {
+    damping: 50,
+    stiffness: 400
+  });
+  // Maps high velocity to a maximum of 15px offset in either direction
+  const textShift = useTransform(smoothVelocity, [-3000, 3000], [15, -15]);
+  // -----------------------------------
+
   const heroY = useTransform(scrollY, [0, 500], [0, 150]);
   const introY = useTransform(scrollY, [400, 1200], [40, -40]);
 
@@ -52,6 +64,7 @@ const Home: React.FC = () => {
           className="relative z-10 text-center px-4 max-w-5xl"
         >
           <motion.span 
+            style={{ y: textShift }} // Applied scroll-direction motion
             initial={{ opacity: 0, letterSpacing: '0.8em' }}
             animate={{ opacity: 1, letterSpacing: '0.5em' }}
             transition={{ duration: 1.5, delay: 0.2 }}
@@ -59,9 +72,12 @@ const Home: React.FC = () => {
           >
             Distilled in the Wild
           </motion.span>
-          <h1 className="text-6xl md:text-9xl serif mb-12 italic leading-tight tracking-tight">
+          <motion.h1 
+            style={{ y: textShift }} // Applied scroll-direction motion
+            className="text-6xl md:text-9xl serif mb-12 italic leading-tight tracking-tight"
+          >
             Nature, Refined.
-          </h1>
+          </motion.h1>
           <Link to="/collection" className="group relative inline-block px-14 py-6 border border-white/10 overflow-hidden transition-all duration-700">
             <span className="relative z-10 text-[10px] uppercase tracking-[0.4em] font-bold group-hover:text-black transition-colors duration-500">
               Explore the Collection
@@ -88,11 +104,11 @@ const Home: React.FC = () => {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 1.2, ease: [0.2, 0, 0, 1] }}
             >
-                <span className="text-[10px] uppercase tracking-[0.4em] text-[#555] mb-6 block">Our Home</span>
-                <h2 className="serif text-4xl md:text-6xl mb-10 italic leading-tight">Provenance at its purest.</h2>
-                <p className="text-[#888] text-lg leading-[1.9] font-light mb-10">
+                <motion.span style={{ y: textShift }} className="text-[10px] uppercase tracking-[0.4em] text-[#555] mb-6 block">Our Home</motion.span>
+                <motion.h2 style={{ y: textShift }} className="serif text-4xl md:text-6xl mb-10 italic leading-tight">Provenance at its purest.</motion.h2>
+                <motion.p style={{ y: textShift }} className="text-[#888] text-lg leading-[1.9] font-light mb-10">
                     Hepple is more than a name; it is a location. Nestled in the remote moors of Northumberland, our distillery is surrounded by the very botanicals that define our spirits.
-                </p>
+                </motion.p>
                 <Link to="/about" className="group inline-flex items-center text-[10px] uppercase tracking-widest border-b border-white/10 pb-2 hover:border-white transition-all">
                   The Hepple Heritage
                   <span className="ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500">→</span>
@@ -113,8 +129,8 @@ const Home: React.FC = () => {
       <section className="bg-[#0a0a0a] py-52 px-8">
         <div className="max-w-screen-xl mx-auto">
             <div className="text-center mb-32">
-                <span className="text-[10px] uppercase tracking-[0.4em] text-[#555] mb-4 block">Selected Works</span>
-                <h2 className="serif text-5xl italic">The Award Winners</h2>
+                <motion.span style={{ y: textShift }} className="text-[10px] uppercase tracking-[0.4em] text-[#555] mb-4 block">Selected Works</motion.span>
+                <motion.h2 style={{ y: textShift }} className="serif text-5xl italic">The Award Winners</motion.h2>
             </div>
             
             <div className="relative flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-0">
@@ -140,9 +156,9 @@ const Home: React.FC = () => {
                       </div>
                       <div className="text-left space-y-8 pl-0 lg:pl-12">
                         <div>
-                          <span className="text-[10px] uppercase tracking-[0.3em] text-[#6d7e6d] block mb-2">{products[activeProductIndex].tag}</span>
-                          <h3 className="serif text-5xl italic mb-4">{products[activeProductIndex].name}</h3>
-                          <p className="text-[#666] text-lg font-light leading-relaxed max-w-sm">{products[activeProductIndex].desc}</p>
+                          <motion.span style={{ y: textShift }} className="text-[10px] uppercase tracking-[0.3em] text-[#6d7e6d] block mb-2">{products[activeProductIndex].tag}</motion.span>
+                          <motion.h3 style={{ y: textShift }} className="serif text-5xl italic mb-4">{products[activeProductIndex].name}</motion.h3>
+                          <motion.p style={{ y: textShift }} className="text-[#666] text-lg font-light leading-relaxed max-w-sm">{products[activeProductIndex].desc}</motion.p>
                         </div>
                         <Link to={`/product/${products[activeProductIndex].id}`} className="inline-block border border-white/20 px-10 py-4 text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-500">
                           View Specifications

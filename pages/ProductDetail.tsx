@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useVelocity, useSpring } from 'framer-motion';
 
 const productData: Record<string, any> = {
   'hepple-gin': {
@@ -51,6 +51,16 @@ const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const product = productData[id || 'hepple-gin'];
   const { scrollY } = useScroll();
+  
+  // -- SCROLL DIRECTION MOTION LOGIC --
+  const scrollVelocity = useVelocity(scrollY);
+  const smoothVelocity = useSpring(scrollVelocity, {
+    damping: 50,
+    stiffness: 400
+  });
+  const textShift = useTransform(smoothVelocity, [-3000, 3000], [15, -15]);
+  // -----------------------------------
+
   const bottleY = useTransform(scrollY, [0, 1000], [0, 80]);
 
   if (!product) return <div className="pt-32 text-center serif text-3xl">Spirits not found.</div>;
@@ -82,12 +92,12 @@ const ProductDetail: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1, ease: [0.2, 0, 0, 1] }}
             >
-              <span className="text-[10px] uppercase tracking-[0.4em] text-[#6d7e6d] font-bold mb-6 block">{product.tagline}</span>
-              <h1 className="serif text-5xl md:text-8xl mb-8 leading-tight italic">{product.name}</h1>
-              <p className="text-2xl font-light text-[#888] mb-12">{product.price}</p>
-              <p className="text-[#aaa] text-xl leading-relaxed font-light border-l border-white/5 pl-8 italic">
+              <motion.span style={{ y: textShift }} className="text-[10px] uppercase tracking-[0.4em] text-[#6d7e6d] font-bold mb-6 block">{product.tagline}</motion.span>
+              <motion.h1 style={{ y: textShift }} className="serif text-5xl md:text-8xl mb-8 leading-tight italic">{product.name}</motion.h1>
+              <motion.p style={{ y: textShift }} className="text-2xl font-light text-[#888] mb-12">{product.price}</motion.p>
+              <motion.p style={{ y: textShift }} className="text-[#aaa] text-xl leading-relaxed font-light border-l border-white/5 pl-8 italic">
                 {product.description}
-              </p>
+              </motion.p>
             </motion.header>
 
             <motion.section
@@ -96,12 +106,12 @@ const ProductDetail: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 1 }}
             >
-              <h3 className="text-[10px] uppercase tracking-[0.4em] text-white font-bold mb-10 border-b border-white/10 pb-4">Botanical Profile</h3>
+              <motion.h3 style={{ y: textShift }} className="text-[10px] uppercase tracking-[0.4em] text-white font-bold mb-10 border-b border-white/10 pb-4">Botanical Profile</motion.h3>
               <ul className="grid grid-cols-2 gap-6">
                 {product.botanicals.map((b: string) => (
-                  <li key={b} className="text-xs uppercase tracking-[0.2em] text-[#555] flex items-center hover:text-white transition-colors">
+                  <motion.li key={b} style={{ y: textShift }} className="text-xs uppercase tracking-[0.2em] text-[#555] flex items-center hover:text-white transition-colors">
                     <span className="w-1 h-1 bg-[#2d3a2d] mr-4"></span> {b}
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
             </motion.section>
@@ -112,19 +122,19 @@ const ProductDetail: React.FC = () => {
               viewport={{ once: true }}
               className="bg-white/[0.02] p-12 space-y-12 border border-white/5"
             >
-              <h3 className="serif text-3xl italic text-center text-[#999]">Tasting Notes</h3>
+              <motion.h3 style={{ y: textShift }} className="serif text-3xl italic text-center text-[#999]">Tasting Notes</motion.h3>
               <div className="grid grid-cols-1 gap-12">
                   <div className="group">
-                      <span className="text-[9px] uppercase tracking-[0.4em] text-[#444] block mb-4 group-hover:text-[#888] transition-colors">The Nose</span>
-                      <p className="text-[#888] font-light text-lg leading-relaxed">{product.notes.nose}</p>
+                      <motion.span style={{ y: textShift }} className="text-[9px] uppercase tracking-[0.4em] text-[#444] block mb-4 group-hover:text-[#888] transition-colors">The Nose</motion.span>
+                      <motion.p style={{ y: textShift }} className="text-[#888] font-light text-lg leading-relaxed">{product.notes.nose}</motion.p>
                   </div>
                   <div className="group">
-                      <span className="text-[9px] uppercase tracking-[0.4em] text-[#444] block mb-4 group-hover:text-[#888] transition-colors">The Palate</span>
-                      <p className="text-[#888] font-light text-lg leading-relaxed">{product.notes.palate}</p>
+                      <motion.span style={{ y: textShift }} className="text-[9px] uppercase tracking-[0.4em] text-[#444] block mb-4 group-hover:text-[#888] transition-colors">The Palate</motion.span>
+                      <motion.p style={{ y: textShift }} className="text-[#888] font-light text-lg leading-relaxed">{product.notes.palate}</motion.p>
                   </div>
                   <div className="group">
-                      <span className="text-[9px] uppercase tracking-[0.4em] text-[#444] block mb-4 group-hover:text-[#888] transition-colors">The Finish</span>
-                      <p className="text-[#888] font-light text-lg leading-relaxed">{product.notes.finish}</p>
+                      <motion.span style={{ y: textShift }} className="text-[9px] uppercase tracking-[0.4em] text-[#444] block mb-4 group-hover:text-[#888] transition-colors">The Finish</motion.span>
+                      <motion.p style={{ y: textShift }} className="text-[#888] font-light text-lg leading-relaxed">{product.notes.finish}</motion.p>
                   </div>
               </div>
             </motion.section>
@@ -135,10 +145,10 @@ const ProductDetail: React.FC = () => {
               viewport={{ once: true }}
               className="border border-white/5 p-12"
             >
-              <h3 className="text-[10px] uppercase tracking-[0.4em] text-white font-bold mb-8">Service Suggestion</h3>
-              <p className="text-[#aaa] font-light leading-relaxed text-lg italic">
+              <motion.h3 style={{ y: textShift }} className="text-[10px] uppercase tracking-[0.4em] text-white font-bold mb-8">Service Suggestion</motion.h3>
+              <motion.p style={{ y: textShift }} className="text-[#aaa] font-light leading-relaxed text-lg italic">
                   {product.cocktail}
-              </p>
+              </motion.p>
             </motion.section>
 
             <div className="pt-12">
