@@ -13,7 +13,7 @@ const Home: React.FC = () => {
   });
   
   /** 
-   * DIRECTION REVERSAL: 
+   * DIRECTION: 
    * Scroll DOWN (Velocity +) -> Text moves DOWN (Y +)
    * Scroll UP (Velocity -) -> Text moves UP (Y -)
    */

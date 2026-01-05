@@ -17,7 +17,8 @@ const Navbar: React.FC = () => {
           {[
             { name: 'Collection', path: '/collection' },
             { name: 'The Story', path: '/about' },
-            { name: 'Inquiries', path: '/contact' }
+            { name: 'Inquiries', path: '/contact' },
+            { name: 'Intel', path: '/analytics' } // Added subtle dashboard link
           ].map((link) => (
             <Link 
               key={link.path}

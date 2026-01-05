@@ -8,7 +8,9 @@ import ProductDetail from './pages/ProductDetail';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Checkout from './pages/Checkout';
+import Dashboard from './pages/Dashboard';
 import { motion, AnimatePresence } from 'framer-motion';
+import tracker from './analytics'; // Auto-initializes on import
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -122,6 +124,7 @@ const App: React.FC = () => {
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/checkout/:id" element={<Checkout />} />
+              <Route path="/analytics" element={<Dashboard />} />
             </Routes>
           </main>
           <Footer />
