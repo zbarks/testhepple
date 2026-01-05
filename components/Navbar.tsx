@@ -28,14 +28,6 @@ const Navbar: React.FC = () => {
               {link.name}
             </Link>
           ))}
-          {/* Standalone Analytics Page Link */}
-          <a 
-            href="analytics.html" 
-            target="_blank" 
-            className="text-[9px] uppercase tracking-[0.3em] font-semibold text-[#444] hover:text-white transition-all duration-700 nav-link-effect"
-          >
-            Intel
-          </a>
         </div>
 
         <Link to="/collection" className="group relative bg-white text-black px-8 py-3 text-[10px] uppercase font-bold tracking-[0.2em] overflow-hidden transition-all duration-700">
