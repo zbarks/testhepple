@@ -1,23 +1,30 @@
 import React, { useMemo, useState } from 'react';
+// @ts-ignore
 import tracker from '../analytics';
 import { motion } from 'framer-motion';
 
 const Dashboard: React.FC = () => {
   const [refresh, setRefresh] = useState(0);
-  const stats = useMemo(() => tracker.getAggregatedData(), [refresh]);
-  const rawData = useMemo(() => tracker.getRawData(), [refresh]);
+  const stats = useMemo(() => tracker.getAggregatedData(), [refresh]) as any;
+  const rawData = useMemo(() => tracker.getRawData(), [refresh]) as any[];
 
-  const sortedClicks = Object.entries(stats.clicks)
-    .sort((a, b) => b[1] - a[1])
+  const sortedClicks = Object.entries(stats.clicks as Record<string, number>)
+    .sort((a, b) => (b[1] as number) - (a[1] as number))
     .slice(0, 8);
 
-  const sortedHovers = Object.entries(stats.hovers)
-    .sort((a, b) => b[1] - a[1])
+  const sortedHovers = Object.entries(stats.hovers as Record<string, number>)
+    .sort((a, b) => (b[1] as number) - (a[1] as number))
     .slice(0, 8);
 
-  const recentEvents = rawData.sessions
-    .flatMap(s => s.pages.flatMap(p => p.events))
-    .sort((a, b) => b.timestamp - a.timestamp)
+  // Process recent events from the flat log structure
+  const recentEvents = rawData
+    .map(e => ({
+        type: e.event_type,
+        target: e.element_id,
+        path: e.page,
+        timestamp: e.timestamp
+    }))
+    .sort((a, b) => (b.timestamp as number) - (a.timestamp as number))
     .slice(0, 15);
 
   return (
@@ -54,7 +61,7 @@ const Dashboard: React.FC = () => {
               className="bg-white/[0.02] border border-white/5 p-8 flex flex-col justify-between"
             >
               <span className="text-[9px] uppercase tracking-widest text-[#555] mb-8">{stat.label}</span>
-              <span className="serif text-4xl italic">{stat.value}</span>
+              <span className="serif text-4xl italic">{stat.value as React.ReactNode}</span>
             </motion.div>
           ))}
         </div>
@@ -67,12 +74,13 @@ const Dashboard: React.FC = () => {
             <h2 className="serif text-3xl italic mb-12">Interaction Heatmap (Clicks)</h2>
             <div className="space-y-6">
               {sortedClicks.map(([target, count], i) => {
-                const percentage = Math.max(5, (count / (sortedClicks[0][1])) * 100);
+                const maxCount = (sortedClicks[0][1] as number) || 1;
+                const percentage = Math.max(5, ((count as number) / maxCount) * 100);
                 return (
                   <div key={i} className="group">
                     <div className="flex justify-between text-[10px] uppercase tracking-widest text-[#888] mb-2">
-                      <span className="truncate max-w-[80%]">{target}</span>
-                      <span>{count} interactions</span>
+                      <span className="truncate max-w-[80%]">{target as React.ReactNode}</span>
+                      <span>{count as React.ReactNode} interactions</span>
                     </div>
                     <div className="h-1 bg-white/5 w-full relative overflow-hidden">
                       <motion.div 
@@ -93,12 +101,13 @@ const Dashboard: React.FC = () => {
             <h2 className="serif text-3xl italic mb-12">Visual Engagement (Hovers)</h2>
             <div className="space-y-6">
               {sortedHovers.map(([target, count], i) => {
-                const percentage = Math.max(5, (count / (sortedHovers[0][1])) * 100);
+                const maxCount = (sortedHovers[0][1] as number) || 1;
+                const percentage = Math.max(5, ((count as number) / maxCount) * 100);
                 return (
                   <div key={i} className="group">
                     <div className="flex justify-between text-[10px] uppercase tracking-widest text-[#888] mb-2">
-                      <span className="truncate max-w-[80%]">{target}</span>
-                      <span>{count} focuses</span>
+                      <span className="truncate max-w-[80%]">{target as React.ReactNode}</span>
+                      <span>{count as React.ReactNode} focuses</span>
                     </div>
                     <div className="h-1 bg-white/5 w-full relative overflow-hidden">
                       <motion.div 
@@ -144,7 +153,7 @@ const Dashboard: React.FC = () => {
                     <td className="py-6 text-[#888] truncate max-w-[200px]">{e.target || '-'}</td>
                     <td className="py-6 italic text-[#555]">{e.path}</td>
                     <td className="py-6 text-right text-[10px] text-[#333]">
-                      {new Date(e.timestamp).toLocaleTimeString()}
+                      {new Date(e.timestamp as number).toLocaleTimeString()}
                     </td>
                   </tr>
                 ))}

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
 
 const Navbar: React.FC = () => {
   const location = useLocation();
@@ -17,8 +16,7 @@ const Navbar: React.FC = () => {
           {[
             { name: 'Collection', path: '/collection' },
             { name: 'The Story', path: '/about' },
-            { name: 'Inquiries', path: '/contact' },
-            { name: 'Intel', path: '/analytics' } // Added subtle dashboard link
+            { name: 'Inquiries', path: '/contact' }
           ].map((link) => (
             <Link 
               key={link.path}
@@ -30,6 +28,14 @@ const Navbar: React.FC = () => {
               {link.name}
             </Link>
           ))}
+          {/* Standalone Analytics Page Link */}
+          <a 
+            href="analytics.html" 
+            target="_blank" 
+            className="text-[9px] uppercase tracking-[0.3em] font-semibold text-[#444] hover:text-white transition-all duration-700 nav-link-effect"
+          >
+            Intel
+          </a>
         </div>
 
         <Link to="/collection" className="group relative bg-white text-black px-8 py-3 text-[10px] uppercase font-bold tracking-[0.2em] overflow-hidden transition-all duration-700">
