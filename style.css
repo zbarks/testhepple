@@ -10,17 +10,12 @@ h1, h2, h3, h4, .serif {
     font-family: 'Playfair Display', serif;
 }
 
-/* Luxury 3D Perspective Architecture */
+/* Quiet Luxury Utilities */
 :root {
     --ease-luxury: cubic-bezier(0.2, 0, 0, 1);
 }
 
-.perspective-container {
-    perspective: 2000px;
-    transform-style: preserve-3d;
-}
-
-/* Custom Scrollbar */
+/* Custom Minimalist Scrollbar */
 ::-webkit-scrollbar {
     width: 2px;
 }
@@ -31,73 +26,46 @@ h1, h2, h3, h4, .serif {
     background: #1a1a1a;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #2d3a2d;
+    background: #6d7e6d;
 }
 
-/* Glass UI & Modern Accents */
+/* Glass & Glow */
 .glass-nav {
-    background: rgba(13, 13, 13, 0.5);
+    background: rgba(13, 13, 13, 0.4);
     backdrop-filter: blur(40px);
     -webkit-backdrop-filter: blur(40px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.015);
-}
-
-.product-glow {
-    position: relative;
-    z-index: 1;
-}
-
-.product-glow::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    height: 90%;
-    background: radial-gradient(circle, rgba(109, 126, 109, 0.06) 0%, transparent 75%);
-    z-index: -1;
-    pointer-events: none;
-    filter: blur(60px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.01);
 }
 
 .editorial-line {
     width: 1px;
-    height: 140px;
-    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.2), transparent);
+    height: 120px;
+    background: linear-gradient(to bottom, transparent, rgba(109, 126, 109, 0.3), transparent);
 }
 
-/* Interactive Link Polish */
-.nav-link-effect {
-    position: relative;
-}
-.nav-link-effect::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: #6d7e6d;
-    transition: width 1s var(--ease-luxury);
-}
-.nav-link-effect:hover::after {
-    width: 100%;
-}
-
-/* Global Transitions */
-* {
-    transition-timing-function: var(--ease-luxury);
-}
-
+/* Selections */
 ::selection {
     background-color: #2d3a2d;
     color: white;
 }
 
-/* Hardware Accelerated Images */
-img {
+/* Transition Smoothing */
+* {
+    transition-timing-function: var(--ease-luxury);
+}
+
+/* Hardware Acceleration for Carousel */
+.flex-shrink-0 {
+    will-change: transform;
     backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    transform: translateZ(0);
+}
+
+img {
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Text Polish */
+.tracking-tighter {
+    letter-spacing: -0.04em;
 }
