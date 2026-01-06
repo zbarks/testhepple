@@ -10,13 +10,13 @@ h1, h2, h3, h4, .serif {
     font-family: 'Playfair Display', serif;
 }
 
-/* 3D Perspective Architecture */
+/* Luxury 3D Perspective Architecture */
 :root {
     --ease-luxury: cubic-bezier(0.2, 0, 0, 1);
 }
 
 .perspective-container {
-    perspective: 1500px;
+    perspective: 2000px;
     transform-style: preserve-3d;
 }
 
@@ -31,15 +31,15 @@ h1, h2, h3, h4, .serif {
     background: #1a1a1a;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #6d7e6d;
+    background: #2d3a2d;
 }
 
-/* Glass & Glow */
+/* Glass UI & Modern Accents */
 .glass-nav {
-    background: rgba(13, 13, 13, 0.6);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+    background: rgba(13, 13, 13, 0.5);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.015);
 }
 
 .product-glow {
@@ -53,57 +53,51 @@ h1, h2, h3, h4, .serif {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 80%;
-    height: 80%;
-    background: radial-gradient(circle, rgba(109, 126, 109, 0.08) 0%, transparent 70%);
+    width: 90%;
+    height: 90%;
+    background: radial-gradient(circle, rgba(109, 126, 109, 0.06) 0%, transparent 75%);
     z-index: -1;
     pointer-events: none;
+    filter: blur(60px);
 }
 
 .editorial-line {
     width: 1px;
-    height: 100px;
-    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.15), transparent);
+    height: 140px;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.2), transparent);
 }
 
-/* Interactive Element Styles */
+/* Interactive Link Polish */
 .nav-link-effect {
     position: relative;
 }
 .nav-link-effect::after {
     content: '';
     position: absolute;
-    bottom: -6px;
+    bottom: -8px;
     left: 0;
     width: 0;
     height: 1px;
     background: #6d7e6d;
-    transition: width 0.8s var(--ease-luxury);
+    transition: width 1s var(--ease-luxury);
 }
 .nav-link-effect:hover::after {
     width: 100%;
 }
 
-/* Image Reveal Masking */
-.reveal-mask {
-    overflow: hidden;
-    clip-path: inset(0 0 0 0);
-    transition: clip-path 1.5s var(--ease-luxury);
+/* Global Transitions */
+* {
+    transition-timing-function: var(--ease-luxury);
 }
 
-/* Selection Highlight */
 ::selection {
     background-color: #2d3a2d;
     color: white;
 }
 
-/* Smooth Image Loading */
+/* Hardware Accelerated Images */
 img {
-    opacity: 0;
-    animation: fadeIn 1s ease-out forwards;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
 }
