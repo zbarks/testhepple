@@ -1,190 +1,227 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform, useSpring, useVelocity } from 'framer-motion';
 
-const HE_IMAGE = "data:image/png;base64,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";
-
-const Bottle3D = () => {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"]
-  });
-
-  // Layer Animations
-  const stopperY = useTransform(scrollYProgress, [0.4, 0.6], [0, -220]);
-  const neckY = useTransform(scrollYProgress, [0.45, 0.65], [0, -80]);
-  const rotationZ = useTransform(scrollYProgress, [0.4, 0.7], [0, 12]);
-  const opacity = useTransform(scrollYProgress, [0.3, 0.45, 0.7, 0.85], [0, 1, 1, 0]);
-  const scale = useSpring(useTransform(scrollYProgress, [0.4, 0.6], [0.8, 1.1]), { stiffness: 100, damping: 20 });
+// Decorative 3D elements that drift in the background/foreground
+const FloatingBotanicals = () => {
+  const { scrollYProgress } = useScroll();
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -500]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, -1000]);
+  const rotate = useTransform(scrollYProgress, [0, 1], [0, 45]);
 
   return (
-    <section ref={ref} className="relative h-[200vh] w-full flex items-center justify-center bg-[#0d0d0d] overflow-hidden">
-      <div className="sticky top-0 h-screen w-full flex flex-col lg:flex-row items-center justify-center px-12 gap-20">
-        
-        {/* Callout Text Left */}
-        <motion.div 
-          style={{ opacity: useTransform(scrollYProgress, [0.45, 0.55], [0, 1]) }}
-          className="hidden lg:block space-y-12 max-w-xs"
-        >
-          <div className="border-l border-white/20 pl-6">
-            <span className="text-[9px] uppercase tracking-widest text-[#6d7e6d] font-bold">Phase 01</span>
-            <h4 className="serif text-2xl italic text-white mt-2">The Stopper</h4>
-            <p className="text-sm text-[#555] leading-relaxed mt-4">Pressure-sealed integrity. As we deconstruct the wild, the resins are released first.</p>
-          </div>
-        </motion.div>
-
-        {/* The Animated Bottle Assembly */}
-        <motion.div 
-          style={{ opacity, scale, perspective: 2000 }}
-          className="relative w-[300px] h-[600px] flex items-center justify-center"
-        >
-          {/* Layer 1: Stopper (The Cap) */}
-          <motion.div 
-            style={{ y: stopperY, rotateZ: rotationZ }}
-            className="absolute inset-0 z-30 pointer-events-none"
-          >
-            <img 
-              src={HE_IMAGE} 
-              className="w-full h-full object-contain" 
-              style={{ clipPath: 'inset(0 0 78% 0)' }} 
-              alt="Cap"
-            />
-          </motion.div>
-
-          {/* Layer 2: Neck (The Shoulder) */}
-          <motion.div 
-            style={{ y: neckY, rotateZ: useTransform(scrollYProgress, [0.4, 0.7], [0, 5]) }}
-            className="absolute inset-0 z-20"
-          >
-            <img 
-              src={HE_IMAGE} 
-              className="w-full h-full object-contain" 
-              style={{ clipPath: 'inset(22% 0 55% 0)' }} 
-              alt="Neck"
-            />
-            {/* Vapor Glow */}
-            <motion.div 
-              animate={{ opacity: [0, 0.4, 0], scale: [0.8, 1.2, 0.8] }}
-              transition={{ duration: 4, repeat: Infinity }}
-              className="absolute top-1/4 left-1/2 -translate-x-1/2 w-32 h-32 bg-[#6d7e6d]/20 blur-3xl rounded-full"
-            />
-          </motion.div>
-
-          {/* Layer 3: Main Body */}
-          <motion.div className="absolute inset-0 z-10">
-            <img 
-              src={HE_IMAGE} 
-              className="w-full h-full object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.8)]" 
-              style={{ clipPath: 'inset(45% 0 0 0)' }} 
-              alt="Body"
-            />
-          </motion.div>
-        </motion.div>
-
-        {/* Callout Text Right */}
-        <motion.div 
-          style={{ opacity: useTransform(scrollYProgress, [0.55, 0.65], [0, 1]) }}
-          className="hidden lg:block space-y-12 max-w-xs"
-        >
-          <div className="border-r border-white/20 pr-6 text-right">
-            <span className="text-[9px] uppercase tracking-widest text-[#6d7e6d] font-bold">Phase 02</span>
-            <h4 className="serif text-2xl italic text-white mt-2">CO2 Purity</h4>
-            <p className="text-sm text-[#555] leading-relaxed mt-4">Deep structural fidelity. We extract the impossible green notes using surgical precision.</p>
-          </div>
-        </motion.div>
-
-        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 text-center">
-            <motion.p 
-                style={{ opacity: useTransform(scrollYProgress, [0.35, 0.5], [1, 0]) }}
-                className="text-[10px] uppercase tracking-[0.5em] text-white/40"
-            >
-                Scroll to Deconstruct
-            </motion.p>
-        </div>
-      </div>
-    </section>
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      {/* Science/Lab Element */}
+      <motion.div 
+        style={{ y: y1, rotate, opacity: 0.1 }}
+        className="absolute top-[20%] -left-20 w-96 h-96 border border-white rounded-full flex items-center justify-center"
+      >
+        <div className="w-[1px] h-full bg-white/20 rotate-45"></div>
+      </motion.div>
+      
+      {/* Wild Element - Blurred Greenery */}
+      <motion.div 
+        style={{ y: y2, x: 100 }}
+        className="absolute top-[60%] -right-40 w-[500px] h-[500px] bg-[#2d3a2d]/20 blur-[120px] rounded-full"
+      />
+      
+      {/* Shimmering Particle */}
+      <motion.div 
+        animate={{ opacity: [0.2, 0.5, 0.2] }}
+        transition={{ duration: 4, repeat: Infinity }}
+        className="absolute top-[40%] left-[30%] w-[1px] h-40 bg-gradient-to-b from-transparent via-white/40 to-transparent"
+      />
+    </div>
   );
 };
 
 const Home: React.FC = () => {
+  const containerRef = useRef(null);
   const { scrollY } = useScroll();
   const scrollVelocity = useVelocity(scrollY);
-  const smoothVelocity = useSpring(scrollVelocity, { damping: 60, stiffness: 500 });
-  const textShift = useTransform(smoothVelocity, [-2000, 2000], [-12, 12]);
+  const smoothVelocity = useSpring(scrollVelocity, { damping: 50, stiffness: 400 });
+  
+  // Dynamic skew/tilt based on scroll speed
+  const skew = useTransform(smoothVelocity, [-2000, 2000], [-2, 2]);
+  const scale = useTransform(smoothVelocity, [-2000, 2000], [0.98, 1.02]);
 
   const products = [
     { 
       name: 'Hepple Gin', 
-      tag: 'High-Fidelity Spirit', 
+      tag: 'Phase 01: The Heart', 
       img: 'https://i.postimg.cc/t4z9nPLF/Untitleddesign-Photoroom.png', 
-      id: 'hepple-gin',
-      desc: 'Our flagship. A surgical extraction of the wild juniper heart.'
+      id: 'hepple-gin'
     },
     { 
-      name: 'Douglas Fir Vodka', 
-      tag: 'Liquid Pine Forest', 
+      name: 'Douglas Fir', 
+      tag: 'Phase 02: Extraction', 
       img: 'https://i.postimg.cc/SsSqGsbr/Generated-Image-January-04-2026-8-39PM-Photoroom.png', 
-      id: 'douglas-fir-vodka',
-      desc: 'Transportive, zesty, and unashamedly bold.'
+      id: 'douglas-fir-vodka'
     },
     { 
       name: 'Sloe & Hawthorn', 
-      tag: 'The Wild Hedgerow', 
+      tag: 'Phase 03: Resonance', 
       img: 'https://i.postimg.cc/QMjv2yYK/Untitled-design-3-Photoroom.png', 
-      id: 'sloe-hawthorn-gin',
-      desc: 'A dry, peppery British classic with a modern edge.'
+      id: 'sloe-hawthorn-gin'
     }
   ];
 
   return (
-    <div className="overflow-hidden bg-[#0d0d0d]">
-      {/* Hero */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <motion.div style={{ y: useTransform(scrollY, [0, 1000], [0, 300]) }} className="absolute inset-0 z-0">
-          <img src="https://i.postimg.cc/Wz0BLcVD/Hepple-1200x200-ad-15-(1).png" className="w-full h-full object-cover scale-110 brightness-[0.2]" alt="Moors" />
-        </motion.div>
-        
-        <div className="relative z-10 text-center px-4">
-          <motion.span style={{ y: textShift }} className="text-[10px] uppercase text-[#6d7e6d] mb-12 block font-bold tracking-[0.8em]">The Elegant Wild</motion.span>
-          <motion.h1 style={{ y: textShift }} className="text-7xl md:text-[13rem] serif italic leading-[0.8] tracking-tighter">High<br/>Fidelity.</motion.h1>
-          <div className="mt-16">
-            <Link to="/collection" className="group relative inline-block px-14 py-6 border border-white/10 overflow-hidden">
-                <span className="relative z-10 text-[10px] uppercase tracking-[0.4em] font-bold group-hover:text-black">Enter House</span>
-                <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.2,0,0,1)]"></div>
+    <div ref={containerRef} className="relative bg-[#0d0d0d]">
+      <FloatingBotanicals />
+
+      {/* Hero Section with 3D Depth */}
+      <section className="relative h-[120vh] flex items-center justify-center perspective-container overflow-hidden">
+        <motion.div 
+          style={{ skewY: skew, scale }}
+          className="relative z-10 text-center space-y-12 px-8"
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.5, ease: [0.2, 0, 0, 1] }}
+          >
+            <span className="text-[10px] uppercase tracking-[0.8em] text-[#6d7e6d] font-bold block mb-8">
+              Northumberland • High Fidelity
+            </span>
+            <h1 className="text-7xl md:text-[13rem] serif leading-[0.85] italic tracking-tighter text-white">
+              The Wild,<br/>Refined.
+            </h1>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 1 }}
+            className="flex flex-col items-center space-y-8"
+          >
+            <div className="editorial-line"></div>
+            <Link to="/collection" className="group relative inline-block px-12 py-5 border border-white/10 overflow-hidden">
+              <span className="relative z-10 text-[10px] uppercase tracking-[0.4em] font-bold group-hover:text-black transition-colors duration-500">
+                Explore the Range
+              </span>
+              <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-[0.2, 0, 0, 1]"></div>
             </Link>
-          </div>
+          </motion.div>
+        </motion.div>
+
+        {/* Ambient background image with depth scroll */}
+        <motion.div 
+          style={{ y: useTransform(scrollY, [0, 1000], [0, 200]), scale: 1.1 }}
+          className="absolute inset-0 z-0 opacity-30 grayscale"
+        >
+          <img 
+            src="https://i.postimg.cc/Wz0BLcVD/Hepple-1200x200-ad-15-(1).png" 
+            className="w-full h-full object-cover"
+            alt=""
+          />
+        </motion.div>
+      </section>
+
+      {/* 3D Content Section: The Philosophy */}
+      <section className="py-60 px-8 relative z-10">
+        <div className="max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
+          <motion.div 
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 1.2, ease: [0.2, 0, 0, 1] }}
+            className="space-y-10"
+          >
+            <span className="text-[10px] uppercase tracking-[0.4em] text-[#555] block">01 / The Ethos</span>
+            <h2 className="serif text-5xl md:text-7xl italic leading-tight">A Surgical Pursuit of Nature.</h2>
+            <p className="text-xl text-[#888] font-light leading-relaxed max-w-lg italic">
+              "We don't just distill; we capture the fleeting vibration of the landscape. Using triple-distillation methods, we preserve the green heart of the moorland."
+            </p>
+            <div className="pt-8">
+                <Link to="/about" className="text-[10px] uppercase tracking-widest border-b border-white/20 pb-2 hover:border-white transition-all">Our Science</Link>
+            </div>
+          </motion.div>
+
+          <motion.div 
+            style={{ rotateY: 15, perspective: 1000 }}
+            whileInView={{ rotateY: 0 }}
+            transition={{ duration: 2, ease: [0.2, 0, 0, 1] }}
+            className="relative"
+          >
+            <div className="aspect-[4/5] bg-white/5 relative overflow-hidden group">
+              <img 
+                src="https://i.postimg.cc/dtvXkXvX/Hepple-1080x1080-ad-12.png" 
+                className="w-full h-full object-cover grayscale brightness-75 transition-transform duration-[3s] group-hover:scale-110"
+                alt="Wild Botanicals"
+              />
+              <div className="absolute inset-0 border-[40px] border-[#0d0d0d] pointer-events-none"></div>
+            </div>
+            {/* Floating 3D Caption */}
+            <motion.div 
+              style={{ y: useTransform(scrollY, [800, 1500], [50, -50]) }}
+              className="absolute -bottom-10 -right-10 bg-white text-black p-10 hidden lg:block shadow-2xl"
+            >
+                <p className="serif text-2xl italic tracking-tight">The Juniper Grove.</p>
+                <span className="text-[9px] uppercase tracking-widest mt-2 block opacity-50">Hepple Estate, 2024</span>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
-      {/* 3D Bottle Scroll Section */}
-      <Bottle3D />
-
-      {/* Grid */}
-      <section className="py-52 px-8 bg-[#0a0a0a]">
-        <div className="max-w-screen-xl mx-auto">
-            <div className="text-center mb-32">
-                <h2 className="serif text-6xl italic">Selected Spirits</h2>
+      {/* Interactive 3D Product Carousel */}
+      <section className="py-60 bg-[#0a0a0a] overflow-hidden">
+        <div className="max-w-screen-2xl mx-auto px-8">
+            <div className="mb-32 flex justify-between items-end">
+                <div className="space-y-4">
+                    <span className="text-[10px] uppercase tracking-[0.4em] text-[#555]">02 / The Collection</span>
+                    <h2 className="serif text-6xl italic">Selected Spirits.</h2>
+                </div>
+                <Link to="/collection" className="hidden md:block text-[10px] uppercase tracking-[0.3em] font-bold border-b border-white/20 pb-2">View Entire Range</Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-24">
                 {products.map((p, i) => (
                     <motion.div 
                         key={p.id}
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={{ opacity: 0, y: 50 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                        className="group bg-white/[0.02] border border-white/5 p-12 hover:bg-white/[0.05] transition-all duration-700"
+                        transition={{ duration: 1, delay: i * 0.2 }}
+                        className="group flex flex-col items-center text-center space-y-12"
                     >
-                        <div className="h-72 mb-10 flex justify-center items-center product-glow">
-                            <img src={p.img} className="h-full object-contain group-hover:scale-110 transition-transform duration-1000" alt={p.name} />
+                        <div className="relative aspect-[3/4] w-full bg-white/[0.02] flex items-center justify-center p-12 overflow-hidden product-glow">
+                            <motion.img 
+                                whileHover={{ scale: 1.1, rotateY: 20, rotateX: -10 }}
+                                transition={{ duration: 0.8, ease: [0.2, 0, 0, 1] }}
+                                src={p.img} 
+                                className="h-[80%] object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.6)]" 
+                                alt={p.name} 
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                            <Link 
+                                to={`/product/${p.id}`}
+                                className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-white text-black px-8 py-4 text-[9px] uppercase font-bold tracking-widest opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500"
+                            >
+                                Details
+                            </Link>
                         </div>
-                        <span className="text-[9px] uppercase tracking-widest text-[#555] block mb-4">{p.tag}</span>
-                        <h3 className="serif text-3xl italic mb-6">{p.name}</h3>
-                        <Link to={`/product/${p.id}`} className="inline-block text-[10px] uppercase tracking-widest border-b border-white/10 pb-1 hover:border-white">Details</Link>
+                        <div className="space-y-4">
+                            <span className="text-[9px] uppercase tracking-[0.4em] text-[#6d7e6d] font-bold">{p.tag}</span>
+                            <h3 className="serif text-3xl italic">{p.name}</h3>
+                        </div>
                     </motion.div>
                 ))}
             </div>
         </div>
+      </section>
+
+      {/* Closing Call to Action with 3D Depth */}
+      <section className="h-screen relative flex items-center justify-center">
+         <motion.div 
+            style={{ y: useTransform(scrollY, [2500, 4000], [100, -100]) }}
+            className="text-center relative z-10"
+         >
+            <h2 className="serif text-5xl md:text-9xl italic mb-16">Enter the Manor.</h2>
+            <Link to="/contact" className="text-[10px] uppercase tracking-[0.5em] font-bold border border-white/20 px-16 py-8 hover:bg-white hover:text-black transition-all duration-700">
+                Book a Visit
+            </Link>
+         </motion.div>
+         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black"></div>
       </section>
     </div>
   );

@@ -10,13 +10,13 @@ h1, h2, h3, h4, .serif {
     font-family: 'Playfair Display', serif;
 }
 
-/* Perspective Engine */
+/* 3D Perspective Architecture */
 :root {
     --ease-luxury: cubic-bezier(0.2, 0, 0, 1);
 }
 
 .perspective-container {
-    perspective: 2000px;
+    perspective: 1500px;
     transform-style: preserve-3d;
 }
 
@@ -34,15 +34,14 @@ h1, h2, h3, h4, .serif {
     background: #6d7e6d;
 }
 
-/* Glass UI */
+/* Glass & Glow */
 .glass-nav {
-    background: rgba(13, 13, 13, 0.7);
+    background: rgba(13, 13, 13, 0.6);
     backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(30px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
 }
 
-/* Enhanced Product Glow */
 .product-glow {
     position: relative;
     z-index: 1;
@@ -54,27 +53,57 @@ h1, h2, h3, h4, .serif {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 70%;
-    height: 70%;
-    background: radial-gradient(circle, rgba(109, 126, 109, 0.12) 0%, transparent 70%);
+    width: 80%;
+    height: 80%;
+    background: radial-gradient(circle, rgba(109, 126, 109, 0.08) 0%, transparent 70%);
     z-index: -1;
     pointer-events: none;
-    filter: blur(40px);
 }
 
 .editorial-line {
     width: 1px;
     height: 100px;
-    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.2), transparent);
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.15), transparent);
 }
 
-/* Hardware Acceleration */
-* {
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
+/* Interactive Element Styles */
+.nav-link-effect {
+    position: relative;
+}
+.nav-link-effect::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #6d7e6d;
+    transition: width 0.8s var(--ease-luxury);
+}
+.nav-link-effect:hover::after {
+    width: 100%;
 }
 
+/* Image Reveal Masking */
+.reveal-mask {
+    overflow: hidden;
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 1.5s var(--ease-luxury);
+}
+
+/* Selection Highlight */
+::selection {
+    background-color: #2d3a2d;
+    color: white;
+}
+
+/* Smooth Image Loading */
 img {
-    user-select: none;
-    -webkit-user-drag: none;
+    opacity: 0;
+    animation: fadeIn 1s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
