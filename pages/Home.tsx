@@ -1,196 +1,197 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform, AnimatePresence, useVelocity, useSpring } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence, useVelocity, useSpring, useMotionValue } from 'framer-motion';
+
+const Bottle3D: React.FC<{ img: string, name: string }> = ({ img, name }) => {
+  const targetRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: targetRef,
+    offset: ["start end", "end start"]
+  });
+
+  // Stoppers and Body split logic
+  const stopperY = useTransform(scrollYProgress, [0.3, 0.6], [0, -120]);
+  const stopperRotate = useTransform(scrollYProgress, [0.3, 0.6], [0, 15]);
+  const bottleRotateX = useTransform(scrollYProgress, [0, 1], [5, -5]);
+  const bottleRotateY = useTransform(scrollYProgress, [0, 1], [-10, 10]);
+  const bottleScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.8, 1, 0.8]);
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+
+  return (
+    <motion.div 
+      ref={targetRef}
+      style={{ 
+        opacity,
+        scale: bottleScale,
+        perspective: 1200
+      }}
+      className="relative w-full h-[600px] flex items-center justify-center"
+    >
+      <motion.div 
+        style={{ rotateX: bottleRotateX, rotateY: bottleRotateY }}
+        className="relative h-full w-full flex items-center justify-center"
+      >
+        {/* Layer 1: The Stopper (Calculated via Clip Path) */}
+        <motion.div 
+          style={{ y: stopperY, rotateZ: stopperRotate }}
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        >
+          <img 
+            src={img} 
+            alt={`${name} Stopper`} 
+            className="h-full object-contain drop-shadow-2xl"
+            style={{ clipPath: 'inset(0 0 78% 0)' }}
+          />
+        </motion.div>
+
+        {/* Layer 2: The Body (Calculated via Clip Path) */}
+        <motion.div 
+          className="absolute inset-0 flex items-center justify-center"
+        >
+          <img 
+            src={img} 
+            alt={`${name} Body`} 
+            className="h-full object-contain drop-shadow-2xl"
+            style={{ clipPath: 'inset(22% 0 0 0)' }}
+          />
+        </motion.div>
+
+        {/* 3D Reflection Highlight Layer */}
+        <motion.div 
+          style={{ 
+            opacity: useTransform(scrollYProgress, [0.4, 0.5, 0.6], [0, 0.3, 0]),
+            scale: 1.1
+          }}
+          className="absolute inset-0 bg-white/10 blur-3xl rounded-full pointer-events-none"
+        />
+      </motion.div>
+    </motion.div>
+  );
+};
 
 const Home: React.FC = () => {
   const { scrollY } = useScroll();
-  
-  // -- REVERSED SCROLL DIRECTION MOTION LOGIC --
   const scrollVelocity = useVelocity(scrollY);
-  const smoothVelocity = useSpring(scrollVelocity, {
-    damping: 60,
-    stiffness: 500
-  });
-  
-  /** 
-   * DIRECTION: 
-   * Scroll DOWN (Velocity +) -> Text moves DOWN (Y +)
-   * Scroll UP (Velocity -) -> Text moves UP (Y -)
-   */
+  const smoothVelocity = useSpring(scrollVelocity, { damping: 60, stiffness: 500 });
   const textShift = useTransform(smoothVelocity, [-2000, 2000], [-12, 12]);
-  // ---------------------------------------------
-
-  const heroY = useTransform(scrollY, [0, 500], [0, 150]);
-  const introY = useTransform(scrollY, [400, 1200], [40, -40]);
 
   const [activeProductIndex, setActiveProductIndex] = useState(0);
 
   const products = [
     { 
       name: 'Hepple Gin', 
-      tag: 'Modern Classic', 
+      tag: 'High-Fidelity Spirit', 
       img: 'https://i.postimg.cc/t4z9nPLF/Untitleddesign-Photoroom.png', 
       id: 'hepple-gin',
-      desc: 'An intense yet elegant reinvention of a classic gin.'
+      desc: 'Our flagship. A surgical extraction of the wild juniper heart.'
     },
     { 
       name: 'Douglas Fir Vodka', 
-      tag: 'Zesty & Tropical', 
+      tag: 'Liquid Pine Forest', 
       img: 'https://i.postimg.cc/SsSqGsbr/Generated-Image-January-04-2026-8-39PM-Photoroom.png', 
       id: 'douglas-fir-vodka',
-      desc: 'Transportive essence of ancient pine forests.'
+      desc: 'Transportive, zesty, and unashamedly bold.'
     },
     { 
       name: 'Sloe & Hawthorn', 
-      tag: 'Juicy & Peppery', 
+      tag: 'The Wild Hedgerow', 
       img: 'https://i.postimg.cc/QMjv2yYK/Untitled-design-3-Photoroom.png', 
       id: 'sloe-hawthorn-gin',
-      desc: 'A sophisticated take on a British tradition.'
+      desc: 'A dry, peppery British classic with a modern edge.'
     }
   ];
 
   return (
-    <div className="overflow-hidden">
+    <div className="overflow-hidden bg-[#0d0d0d]">
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <motion.div style={{ y: heroY }} className="absolute inset-0 z-0">
+        <motion.div style={{ y: useTransform(scrollY, [0, 1000], [0, 300]) }} className="absolute inset-0 z-0">
           <img 
             src="https://i.postimg.cc/Wz0BLcVD/Hepple-1200x200-ad-15-(1).png" 
-            className="w-full h-full object-cover scale-110 brightness-[0.35]" 
-            alt="Northumberland Landscape"
+            className="w-full h-full object-cover scale-110 brightness-[0.25]" 
+            alt="The Hepple Moors"
           />
         </motion.div>
         
         <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.5, ease: [0.2, 0, 0, 1] }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           className="relative z-10 text-center px-4 max-w-5xl"
         >
           <motion.span 
             style={{ y: textShift }} 
-            initial={{ opacity: 0, letterSpacing: '0.8em' }}
-            animate={{ opacity: 1, letterSpacing: '0.5em' }}
-            transition={{ duration: 1.5, delay: 0.2 }}
-            className="text-[10px] uppercase text-[#c0c0c0] mb-8 block"
+            className="text-[10px] uppercase text-[#6d7e6d] mb-12 block font-bold tracking-[0.8em]"
           >
-            Distilled in the Wild
+            Digital Manor House
           </motion.span>
           <motion.h1 
             style={{ y: textShift }} 
-            className="text-6xl md:text-9xl serif mb-12 italic leading-tight tracking-tight"
+            className="text-7xl md:text-[12rem] serif mb-12 italic leading-[0.8] tracking-tighter"
           >
-            Nature, Refined.
+            Refined <br/> by Nature.
           </motion.h1>
-          <Link to="/collection" className="group relative inline-block px-14 py-6 border border-white/10 overflow-hidden transition-all duration-700">
+          <Link to="/collection" className="group relative inline-block px-14 py-6 border border-white/10 overflow-hidden transition-all duration-1000">
             <span className="relative z-10 text-[10px] uppercase tracking-[0.4em] font-bold group-hover:text-black transition-colors duration-500">
-              Explore the Collection
+              Enter the House
             </span>
             <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.2,0,0,1)]"></div>
           </Link>
         </motion.div>
-
-        <motion.div 
-          animate={{ y: [0, 10, 0] }} 
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-30"
-        >
-          <div className="editorial-line"></div>
-        </motion.div>
       </section>
 
-      {/* Intro Editorial */}
-      <section className="py-52 px-8">
-        <div className="max-w-screen-lg mx-auto grid grid-cols-1 md:grid-cols-2 gap-24 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1.2, ease: [0.2, 0, 0, 1] }}
-            >
-                <motion.span style={{ y: textShift }} className="text-[10px] uppercase tracking-[0.4em] text-[#555] mb-6 block">Our Home</motion.span>
-                <motion.h2 style={{ y: textShift }} className="serif text-4xl md:text-6xl mb-10 italic leading-tight">Provenance at its purest.</motion.h2>
-                <motion.p style={{ y: textShift }} className="text-[#888] text-lg leading-[1.9] font-light mb-10">
-                    Hepple is more than a name; it is a location. Nestled in the remote moors of Northumberland, our distillery is surrounded by the very botanicals that define our spirits.
+      {/* 3D DECONSTRUCTION SECTION */}
+      <section className="py-60 px-8 relative overflow-hidden bg-gradient-to-b from-[#0d0d0d] to-[#0a0a0a]">
+        <div className="max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+            <div className="relative z-10 space-y-12">
+                <motion.span style={{ y: textShift }} className="text-[10px] uppercase tracking-[0.5em] text-[#555] block">Structural Fidelity</motion.span>
+                <motion.h2 style={{ y: textShift }} className="serif text-6xl md:text-8xl italic leading-none">The Anatomy <br/> of Freshness.</motion.h2>
+                <motion.p style={{ y: textShift }} className="text-[#888] text-xl font-light leading-relaxed max-w-lg italic">
+                    Our three-stage distillation doesn't just make spirit. It deconstructs the wild, capturing the resinous top-notes of juniper before they vanish. Scroll to witness the separation.
                 </motion.p>
-                <Link to="/about" className="group inline-flex items-center text-[10px] uppercase tracking-widest border-b border-white/10 pb-2 hover:border-white transition-all">
-                  The Hepple Heritage
-                  <span className="ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500">→</span>
-                </Link>
-            </motion.div>
-            
-            <motion.div 
-              style={{ y: introY }}
-              className="relative group overflow-hidden shadow-2xl"
-            >
-                <img src="https://i.postimg.cc/dtvXkXvX/Hepple-1080x1080-ad-12.png" className="w-full grayscale brightness-75 group-hover:scale-110 transition-transform duration-[3s] ease-out" alt="Wild Botanicals" />
-                <div className="absolute inset-0 border-[20px] border-[#0d0d0d] pointer-events-none"></div>
-            </motion.div>
+                <div className="pt-8">
+                  <Link to="/about" className="text-[10px] uppercase tracking-widest border-b border-white/10 pb-2 hover:border-white transition-all">
+                    View Science
+                  </Link>
+                </div>
+            </div>
+
+            <div className="relative">
+                <Bottle3D 
+                  img={products[activeProductIndex].img} 
+                  name={products[activeProductIndex].name} 
+                />
+            </div>
         </div>
       </section>
 
-      {/* Interactive Range Hero Switcher */}
-      <section className="bg-[#0a0a0a] py-52 px-8">
-        <div className="max-w-screen-xl mx-auto">
-            <div className="text-center mb-32">
-                <motion.span style={{ y: textShift }} className="text-[10px] uppercase tracking-[0.4em] text-[#555] mb-4 block">Selected Works</motion.span>
-                <motion.h2 style={{ y: textShift }} className="serif text-5xl italic">The Award Winners</motion.h2>
-            </div>
-            
-            <div className="relative flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-0">
-                {/* Main Interactive Product View */}
-                <div className="w-full lg:w-3/4 relative h-[600px] flex items-center">
-                  <AnimatePresence mode="wait">
-                    <motion.div 
-                      key={products[activeProductIndex].id}
-                      initial={{ opacity: 0, x: 50, scale: 0.95 }}
-                      animate={{ opacity: 1, x: 0, scale: 1 }}
-                      exit={{ opacity: 0, x: -50, scale: 0.95 }}
-                      transition={{ duration: 1, ease: [0.2, 0, 0, 1] }}
-                      className="absolute inset-0 grid grid-cols-1 lg:grid-cols-2 items-center"
-                    >
-                      <div className="flex justify-center items-center h-[500px] product-glow">
+      {/* Editorial Grid with Floating Elements */}
+      <section className="py-52 px-8">
+        <div className="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+            {products.map((p, i) => (
+                <motion.div 
+                    key={p.id}
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.2 }}
+                    className="group bg-white/[0.02] border border-white/5 p-12 hover:bg-white/[0.04] transition-all duration-1000"
+                >
+                    <div className="h-64 mb-12 flex justify-center items-center product-glow overflow-hidden">
                         <motion.img 
-                          animate={{ y: [0, -10, 0] }}
-                          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                          src={products[activeProductIndex].img} 
-                          className="max-h-full object-contain drop-shadow-2xl" 
-                          alt={products[activeProductIndex].name} 
+                            whileHover={{ scale: 1.15, rotate: -5 }}
+                            transition={{ duration: 1, ease: [0.2, 0, 0, 1] }}
+                            src={p.img} 
+                            className="h-full object-contain" 
+                            alt={p.name} 
                         />
-                      </div>
-                      <div className="text-left space-y-8 pl-0 lg:pl-12">
-                        <div>
-                          <motion.span style={{ y: textShift }} className="text-[10px] uppercase tracking-[0.3em] text-[#6d7e6d] block mb-2">{products[activeProductIndex].tag}</motion.span>
-                          <motion.h3 style={{ y: textShift }} className="serif text-5xl italic mb-4">{products[activeProductIndex].name}</motion.h3>
-                          <motion.p style={{ y: textShift }} className="text-[#666] text-lg font-light leading-relaxed max-w-sm">{products[activeProductIndex].desc}</motion.p>
-                        </div>
-                        <Link to={`/product/${products[activeProductIndex].id}`} className="inline-block border border-white/20 px-10 py-4 text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-500">
-                          View Specifications
-                        </Link>
-                      </div>
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
-
-                {/* Sidebar Product Selection */}
-                <div className="w-full lg:w-1/4 flex lg:flex-col gap-4 lg:gap-8 justify-center">
-                  {products.map((item, idx) => (
-                    <button 
-                      key={item.id}
-                      onClick={() => setActiveProductIndex(idx)}
-                      className={`group relative flex items-center p-4 transition-all duration-700 ${activeProductIndex === idx ? 'opacity-100' : 'opacity-30 hover:opacity-60'}`}
-                    >
-                      <div className="h-20 w-20 bg-white/5 p-2 flex items-center justify-center mr-4 transition-transform duration-500 group-hover:scale-110">
-                        <img src={item.img} className="max-h-full object-contain" alt={item.name} />
-                      </div>
-                      <div className="text-left hidden lg:block">
-                        <h4 className="serif text-sm italic">{item.name}</h4>
-                        <div className={`h-[1px] bg-white transition-all duration-700 ${activeProductIndex === idx ? 'w-full' : 'w-0'}`}></div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-            </div>
+                    </div>
+                    <span className="text-[9px] uppercase tracking-[0.4em] text-[#6d7e6d] block mb-4">{p.tag}</span>
+                    <h3 className="serif text-3xl italic mb-6">{p.name}</h3>
+                    <p className="text-[#555] text-sm leading-relaxed mb-8">{p.desc}</p>
+                    <Link to={`/product/${p.id}`} className="text-[9px] uppercase tracking-widest border-b border-white/10 pb-1 group-hover:border-white transition-all">
+                        Details
+                    </Link>
+                </motion.div>
+            ))}
         </div>
       </section>
     </div>

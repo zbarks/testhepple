@@ -14,9 +14,9 @@ const Navbar: React.FC = () => {
         
         <div className="hidden md:flex items-center space-x-16">
           {[
-            { name: 'Collection', path: '/collection' },
-            { name: 'The Story', path: '/about' },
-            { name: 'Inquiries', path: '/contact' }
+            { name: 'The Range', path: '/collection' },
+            { name: 'Philosophy', path: '/about' },
+            { name: 'Concierge', path: '/contact' }
           ].map((link) => (
             <Link 
               key={link.path}
@@ -31,7 +31,7 @@ const Navbar: React.FC = () => {
         </div>
 
         <Link to="/collection" className="group relative bg-white text-black px-8 py-3 text-[10px] uppercase font-bold tracking-[0.2em] overflow-hidden transition-all duration-700">
-          <span className="relative z-10 group-hover:text-white transition-colors duration-500">Shop</span>
+          <span className="relative z-10 group-hover:text-white transition-colors duration-500">Acquire</span>
           <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.2,0,0,1)]"></div>
         </Link>
       </div>
