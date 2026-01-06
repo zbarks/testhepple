@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform, AnimatePresence, useVelocity, useSpring, useMotionValue } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence, useVelocity, useSpring } from 'framer-motion';
 
 const Bottle3D: React.FC<{ img: string, name: string }> = ({ img, name }) => {
   const targetRef = useRef(null);
@@ -9,15 +9,18 @@ const Bottle3D: React.FC<{ img: string, name: string }> = ({ img, name }) => {
     offset: ["start end", "end start"]
   });
 
-  // Refined pop-off logic for just the cork
-  // Based on the provided bottle design, the cork (stopper) is roughly the top 10-12%
-  const stopperY = useTransform(scrollYProgress, [0.35, 0.65], [0, -180]);
-  const stopperRotate = useTransform(scrollYProgress, [0.4, 0.65], [0, 8]);
-  const stopperScale = useTransform(scrollYProgress, [0.4, 0.65], [1, 1.05]);
+  // Animation values for the cork pop
+  const stopperY = useTransform(scrollYProgress, [0.3, 0.65], [0, -220]);
+  const stopperRotate = useTransform(scrollYProgress, [0.35, 0.65], [0, 12]);
+  const stopperScale = useTransform(scrollYProgress, [0.35, 0.65], [1, 1.08]);
   
-  const bottleRotateX = useTransform(scrollYProgress, [0, 1], [3, -3]);
-  const bottleRotateY = useTransform(scrollYProgress, [0, 1], [-8, 8]);
-  const bottleScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.9, 1, 0.9]);
+  // Perspective and depth effects
+  const corkDepthOpacity = useTransform(scrollYProgress, [0.35, 0.45], [0, 1]);
+  const bottleNeckShadow = useTransform(scrollYProgress, [0.35, 0.45], [0, 0.4]);
+
+  const bottleRotateX = useTransform(scrollYProgress, [0, 1], [4, -4]);
+  const bottleRotateY = useTransform(scrollYProgress, [0, 1], [-6, 6]);
+  const bottleScale = useSpring(useTransform(scrollYProgress, [0, 0.5, 1], [0.85, 1, 0.85]), { damping: 20 });
   const opacity = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [0, 1, 1, 0]);
 
   return (
@@ -28,44 +31,67 @@ const Bottle3D: React.FC<{ img: string, name: string }> = ({ img, name }) => {
         scale: bottleScale,
         perspective: 1500
       }}
-      className="relative w-full h-[700px] flex items-center justify-center"
+      className="relative w-full h-[750px] flex items-center justify-center"
     >
       <motion.div 
-        style={{ rotateX: bottleRotateX, rotateY: bottleRotateY }}
-        className="relative h-full w-full flex items-center justify-center transform-style-3d"
+        style={{ rotateX: bottleRotateX, rotateY: bottleRotateY, transformStyle: 'preserve-3d' }}
+        className="relative h-full w-full flex items-center justify-center"
       >
-        {/* Layer 1: The Wooden Cork (Stopper) */}
+        {/* Layer 1: The Wooden Cork (Stopper) Fragment */}
         <motion.div 
-          style={{ y: stopperY, rotateZ: stopperRotate, scale: stopperScale }}
-          className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+          style={{ y: stopperY, rotateZ: stopperRotate, scale: stopperScale, transformStyle: 'preserve-3d' }}
+          className="absolute inset-0 flex items-center justify-center pointer-events-none z-30"
         >
-          <img 
-            src={img} 
-            alt={`${name} Stopper`} 
-            className="h-full object-contain drop-shadow-2xl"
-            style={{ clipPath: 'inset(0 0 88% 0)' }}
-          />
+          <div className="relative h-full w-full flex items-center justify-center">
+            {/* The actual PNG fragment */}
+            <img 
+              src={img} 
+              alt={`${name} Stopper`} 
+              className="h-full object-contain drop-shadow-2xl"
+              style={{ clipPath: 'inset(0 0 88% 0)' }}
+            />
+            
+            {/* 3D Depth Simulation: The "Bottom" of the cork that appears as it lifts */}
+            <motion.div 
+              style={{ 
+                opacity: corkDepthOpacity,
+                top: '11.8%' // Positioned exactly at the cut line
+              }}
+              className="absolute w-20 h-6 bg-[#3d2b1f] rounded-[100%] blur-[2px] shadow-inner"
+            />
+          </div>
         </motion.div>
 
         {/* Layer 2: The Main Glass Bottle Body */}
         <motion.div 
           className="absolute inset-0 flex items-center justify-center z-10"
         >
-          <img 
-            src={img} 
-            alt={`${name} Body`} 
-            className="h-full object-contain drop-shadow-2xl"
-            style={{ clipPath: 'inset(12% 0 0 0)' }}
-          />
+          <div className="relative h-full w-full flex items-center justify-center">
+            <img 
+              src={img} 
+              alt={`${name} Body`} 
+              className="h-full object-contain drop-shadow-2xl"
+              style={{ clipPath: 'inset(12% 0 0 0)' }}
+            />
+            
+            {/* Shadow on the bottle rim where the cork used to be */}
+            <motion.div 
+              style={{ 
+                opacity: bottleNeckShadow,
+                top: '12.2%'
+              }}
+              className="absolute w-16 h-4 bg-black/60 rounded-[100%] blur-[4px] pointer-events-none"
+            />
+          </div>
         </motion.div>
 
-        {/* Subtle Atmospheric Glow when cork pops */}
+        {/* Atmospheric Bloom at the moment of "Pop" */}
         <motion.div 
           style={{ 
-            opacity: useTransform(scrollYProgress, [0.45, 0.55, 0.65], [0, 0.2, 0]),
-            scale: 1.2
+            opacity: useTransform(scrollYProgress, [0.4, 0.5, 0.6], [0, 0.15, 0]),
+            scale: useTransform(scrollYProgress, [0.4, 0.6], [0.8, 1.5]),
           }}
-          className="absolute top-1/4 left-1/2 -translate-x-1/2 w-32 h-32 bg-[#6d7e6d]/20 blur-[80px] rounded-full pointer-events-none"
+          className="absolute top-[12%] left-1/2 -translate-x-1/2 w-40 h-40 bg-white/20 blur-[100px] rounded-full pointer-events-none z-20"
         />
       </motion.div>
     </motion.div>
@@ -77,8 +103,6 @@ const Home: React.FC = () => {
   const scrollVelocity = useVelocity(scrollY);
   const smoothVelocity = useSpring(scrollVelocity, { damping: 60, stiffness: 500 });
   const textShift = useTransform(smoothVelocity, [-2000, 2000], [-10, 10]);
-
-  const [activeProductIndex, setActiveProductIndex] = useState(0);
 
   const products = [
     { 
@@ -108,29 +132,29 @@ const Home: React.FC = () => {
     <div className="overflow-hidden bg-[#0d0d0d]">
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <motion.div style={{ y: useTransform(scrollY, [0, 1000], [0, 250]) }} className="absolute inset-0 z-0">
+        <motion.div style={{ y: useTransform(scrollY, [0, 1000], [0, 300]) }} className="absolute inset-0 z-0">
           <img 
             src="https://i.postimg.cc/Wz0BLcVD/Hepple-1200x200-ad-15-(1).png" 
-            className="w-full h-full object-cover scale-110 brightness-[0.2]" 
+            className="w-full h-full object-cover scale-110 brightness-[0.15]" 
             alt="The Hepple Moors"
           />
         </motion.div>
         
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.8, ease: [0.2, 0, 0, 1] }}
+          transition={{ duration: 2, ease: [0.2, 0, 0, 1] }}
           className="relative z-10 text-center px-4 max-w-5xl"
         >
           <motion.span 
             style={{ y: textShift }} 
-            className="text-[10px] uppercase text-[#6d7e6d] mb-12 block font-bold tracking-[0.9em]"
+            className="text-[10px] uppercase text-[#6d7e6d] mb-12 block font-bold tracking-[1em]"
           >
             Distilled in the Wild
           </motion.span>
           <motion.h1 
             style={{ y: textShift }} 
-            className="text-7xl md:text-[11rem] serif mb-12 italic leading-[0.8] tracking-tighter"
+            className="text-7xl md:text-[12rem] serif mb-12 italic leading-[0.75] tracking-tighter"
           >
             Refined <br/> by Nature.
           </motion.h1>
@@ -143,26 +167,26 @@ const Home: React.FC = () => {
         </motion.div>
       </section>
 
-      {/* 3D DECONSTRUCTION SECTION */}
+      {/* 3D CORK POP SECTION */}
       <section className="py-60 px-8 relative overflow-hidden bg-gradient-to-b from-[#0d0d0d] to-[#0a0a0a]">
         <div className="max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
             <div className="relative z-10 space-y-12">
-                <motion.span style={{ y: textShift }} className="text-[10px] uppercase tracking-[0.5em] text-[#555] block">Structural Fidelity</motion.span>
-                <motion.h2 style={{ y: textShift }} className="serif text-6xl md:text-8xl italic leading-none">The Open <br/> Distillery.</motion.h2>
+                <motion.span style={{ y: textShift }} className="text-[10px] uppercase tracking-[0.5em] text-[#555] block">Unsealing the Moor</motion.span>
+                <motion.h2 style={{ y: textShift }} className="serif text-6xl md:text-8xl italic leading-[0.9]">The Spirit <br/> of Place.</motion.h2>
                 <motion.p style={{ y: textShift }} className="text-[#888] text-xl font-light leading-relaxed max-w-lg italic">
-                    True luxury is transparency. As the stopper yields, we reveal the high-fidelity heart of our spirit—a surgical extraction of the wild landscape.
+                    When the cork yields, the landscape speaks. Our distillation process isn't just about chemistry; it's about absolute fidelity to the raw, untamed botanicals of Northumberland.
                 </motion.p>
                 <div className="pt-8">
                   <Link to="/about" className="text-[10px] uppercase tracking-widest border-b border-white/10 pb-2 hover:border-white transition-all">
-                    Explore Our Science
+                    Discover the Philosophy
                   </Link>
                 </div>
             </div>
 
-            <div className="relative h-[800px] flex items-center justify-center">
+            <div className="relative h-[900px] flex items-center justify-center">
                 <Bottle3D 
-                  img={products[activeProductIndex].img} 
-                  name={products[activeProductIndex].name} 
+                  img={products[0].img} 
+                  name={products[0].name} 
                 />
             </div>
         </div>
@@ -170,26 +194,21 @@ const Home: React.FC = () => {
 
       {/* Range Grid */}
       <section className="py-52 px-8">
-        <div className="max-w-screen-xl mx-auto text-center mb-32">
-            <motion.span style={{ y: textShift }} className="text-[10px] uppercase tracking-[0.5em] text-[#555] block mb-4">The Collection</motion.span>
-            <motion.h2 style={{ y: textShift }} className="serif text-5xl md:text-7xl italic">Captured in Glass.</motion.h2>
-        </div>
-        
         <div className="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
             {products.map((p, i) => (
                 <motion.div 
                     key={p.id}
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.2, duration: 1 }}
+                    transition={{ delay: i * 0.2, duration: 1.2 }}
                     className="group bg-white/[0.02] border border-white/5 p-12 hover:bg-white/[0.04] transition-all duration-1000"
                 >
                     <div className="h-64 mb-12 flex justify-center items-center product-glow overflow-hidden">
                         <motion.img 
-                            whileHover={{ scale: 1.12, rotate: -3 }}
-                            transition={{ duration: 0.8, ease: [0.2, 0, 0, 1] }}
+                            whileHover={{ scale: 1.15, rotate: -3 }}
+                            transition={{ duration: 1, ease: [0.2, 0, 0, 1] }}
                             src={p.img} 
-                            className="h-full object-contain drop-shadow-xl" 
+                            className="h-full object-contain drop-shadow-2xl" 
                             alt={p.name} 
                         />
                     </div>
